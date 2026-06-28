@@ -1,0 +1,24 @@
+# Docker Compose: local development dependencies for AutoTelemetry.
+# Only the database lives here for now; the Spring Boot app runs from the IDE / mvnw.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: autotelemetry-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-autotelemetry}
+      POSTGRES_USER: ${DB_USERNAME:-autotelemetry}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-autotelemetry}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-autotelemetry} -d ${DB_NAME:-autotelemetry}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
