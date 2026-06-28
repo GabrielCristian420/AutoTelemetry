@@ -1,0 +1,56 @@
+# ---------- Compiled / build output ----------
+target/
+build/
+out/
+bin/
+*.class
+
+# ---------- Maven ----------
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# ---------- Gradle (just in case) ----------
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ---------- IDE: IntelliJ / JetBrains ----------
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ---------- IDE: Eclipse / STS ----------
+.settings/
+.loadpath
+.classpath
+.factorypath
+.project
+.apt_generated/
+
+# ---------- IDE: VS Code ----------
+.vscode/
+.history/
+
+# ---------- Spring Boot ----------
+*.log
+logs/
+ HELP.md
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---------- Env / secrets ----------
+.env
+.env.local
+*.local
+application-secret.yml
+
+# ---------- Docker ----------
+# Keep docker-compose.yml tracked, ignore volumes only
+postgres-data/
