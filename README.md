@@ -1,10 +1,8 @@
-# AutoTelemetry 🚗
+# AutoTelemetry
 
 A backend platform for ingesting, storing, and analyzing **vehicle telemetry data** (speed, RPM, engine temperature, fuel level, GPS, OBD-II diagnostic codes) over a REST API.
 
-Built to explore the kind of backend challenges that show up in the **automotive / connected-car** domain — high-frequency ingestion, time-series data, trip reconstruction, and fault-code decoding.
-
----
+It explores the backend challenges that show up in the connected-car / automotive domain: high-frequency ingestion, time-series storage, trip reconstruction, and OBD-II fault-code decoding.
 
 ## 🧱 Tech stack
 
@@ -17,13 +15,30 @@ Built to explore the kind of backend challenges that show up in the **automotive
 | Migrations | Flyway |
 | Security | Spring Security + JWT |
 | Testing | JUnit 5 · Mockito · Testcontainers |
-| Build | Maven (with Maven Wrapper) |
+| Build | Maven |
 | CI/CD | GitHub Actions |
 | Containerization | Docker · docker-compose |
 
----
+## 🚀 Quick start
 
-## 🗺️ Domain model (high level)
+Requirements: **Java 21+**, **Docker**.
+
+```bash
+# Start PostgreSQL
+docker compose up -d
+
+# Run the app (uses the Maven Wrapper, no global Maven needed)
+./mvnw spring-boot:run
+```
+
+The API is available at `http://localhost:8080`.
+
+```bash
+curl http://localhost:8080/api/health
+# {"status":"UP","timestamp":"2026-..."}
+```
+
+## 🗺️ Domain model
 
 ```
 User 1───* Vehicle 1───* Trip 1───* TelemetryReading *───* DtcCode
@@ -32,60 +47,21 @@ User 1───* Vehicle 1───* Trip 1───* TelemetryReading *──�
 - **User** — owns vehicles, authenticates via JWT
 - **Vehicle** — a car (VIN, make, model, plate)
 - **Trip** — a single drive (start/end time, distance)
-- **TelemetryReading** — one sensor sample on a trip (speed, rpm, temp, gps…)
+- **TelemetryReading** — one sensor sample on a trip (speed, rpm, temp, gps)
 - **DtcCode** — OBD-II diagnostic trouble code (e.g. `P0301` = cylinder 1 misfire)
 
----
-
-## 🚀 Quick start
-
-> Requirements: **Java 21+**, **Docker** (with Docker Compose plugin).
-
-```bash
-# 1. Start PostgreSQL in a container
-docker compose up -d
-
-# 2. Run the app (uses the Maven Wrapper, no global Maven needed)
-./mvnw spring-boot:run
-```
-
-The API will be available at `http://localhost:8080`.
-
-Health check:
-```bash
-curl http://localhost:8080/health
-# -> { "status": "UP" }
-```
-
----
-
-## 📦 API overview (work in progress)
+## 📡 API
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET`  | `/health` | Service health check |
-| _more endpoints coming soon_ | | |
-
----
-
-## 🛣️ Roadmap
-
-- [x] Project bootstrap (Spring Boot + Maven + CI)
-- [ ] JPA domain model + Flyway migrations
-- [ ] Telemetry ingestion endpoint
-- [ ] Vehicle / Trip CRUD
-- [ ] JWT authentication (Spring Security)
-- [ ] JUnit + Mockito tests (> 70% coverage)
-- [ ] Stats / aggregation endpoint
-- [ ] _(stretch)_ Async ingestion via Kafka
-- [ ] _(stretch)_ OBD-II DTC decoder
-- [ ] _(stretch)_ Live deploy + dashboard
-
----
+| `GET` | `/api/health` | Service health check |
 
 ## 📂 Project structure
 
-```
+<details>
+<summary>Click to view the directory tree</summary>
+
+```text
 src/
 ├── main/
 │   ├── java/com/gabrielbicu/telemetry/
@@ -103,6 +79,4 @@ src/
 └── test/java/...           # mirrors main/
 ```
 
----
-
-_Status: 🔨 in development — this is a learning/portfolio project._
+</details>
