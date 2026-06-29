@@ -22,6 +22,9 @@ jobs:
           java-version: '21'
           cache: maven          # speeds up builds by caching ~/.m2
 
+      - name: Make Maven Wrapper executable
+        run: chmod +x mvnw
+
       - name: Build and run tests
         run: ./mvnw -B verify
 
