@@ -41,14 +41,21 @@ curl http://localhost:8080/api/health
 ## 🗺️ Domain model
 
 ```
-User 1───* Vehicle 1───* Trip 1───* TelemetryReading *───* DtcCode
+┌──────────┐ 1     * ┌──────────┐ 1     * ┌──────────┐ 1     * ┌─────────────────────┐ *   * ┌──────────┐
+│   User   │─────────│ Vehicle  │─────────│   Trip   │─────────│ TelemetryReading    │───────│ DtcCode  │
+│ owns →   │         │ VIN,make │         │ start/end│         │ speed,rpm,temp,gps  │  M:N  │ OBD-II   │
+└──────────┘         └──────────┘         └──────────┘         └─────────────────────┘       └──────────┘
+   │                    │ (user_id FK)        │ (vehicle_id FK)         │ (trip_id FK)             │
+   │                                         │                         └────── reading_dtc_codes ─┘
+.email,.role                                                                                       (join table)
 ```
 
-- **User** — owns vehicles, authenticates via JWT
-- **Vehicle** — a car (VIN, make, model, plate)
-- **Trip** — a single drive (start/end time, distance)
-- **TelemetryReading** — one sensor sample on a trip (speed, rpm, temp, gps)
-- **DtcCode** — OBD-II diagnostic trouble code (e.g. `P0301` = cylinder 1 misfire)
+- **User** (1) ─ owns → (N) **Vehicle** — authenticates via JWT; `USER`/`ADMIN` role
+- **Vehicle** (1) ─ has → (N) **Trip** — identified by its VIN
+- **Trip** (1) ─ contains → (N) **TelemetryReading** — the high-frequency entity (one sample per second of driving)
+- **TelemetryReading** (N) ─ flags → (N) **DtcCode** — many-to-many via `reading_dtc_codes`; a reading can carry several active fault codes. `DtcCode` is read-only reference data (OBD-II standard codes), so the association is only navigable from the reading side.
+
+> Flyway owns the DDL (`V1__init.sql`); Hibernate runs with `ddl-auto=validate`, so the migration is the single source of truth for the database structure.
 
 ## 📡 API
 
