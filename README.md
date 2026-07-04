@@ -40,14 +40,61 @@ curl http://localhost:8080/api/health
 
 ## 🗺️ Domain model
 
-```
-┌──────────┐ 1     * ┌──────────┐ 1     * ┌──────────┐ 1     * ┌─────────────────────┐ *   * ┌──────────┐
-│   User   │─────────│ Vehicle  │─────────│   Trip   │─────────│ TelemetryReading    │───────│ DtcCode  │
-│ owns →   │         │ VIN,make │         │ start/end│         │ speed,rpm,temp,gps  │  M:N  │ OBD-II   │
-└──────────┘         └──────────┘         └──────────┘         └─────────────────────┘       └──────────┘
-   │                    │ (user_id FK)        │ (vehicle_id FK)         │ (trip_id FK)             │
-   │                                         │                         └────── reading_dtc_codes ─┘
-.email,.role                                                                                       (join table)
+```mermaid
+erDiagram
+    User ||--o{ Vehicle : owns
+    Vehicle ||--o{ Trip : has
+    Trip ||--o{ TelemetryReading : contains
+    TelemetryReading }o--o{ DtcCode : flags
+
+    User {
+        Long id PK
+        String email UK
+        String passwordHash
+        String fullName
+        Role role
+        Instant createdAt
+    }
+
+    Vehicle {
+        Long id PK
+        Long user_id FK
+        String vin UK
+        String make
+        String model
+        Integer year
+        String plate
+        Instant createdAt
+    }
+
+    Trip {
+        Long id PK
+        Long vehicle_id FK
+        Instant startedAt
+        Instant endedAt
+        Double distanceKm
+        Instant createdAt
+    }
+
+    TelemetryReading {
+        Long id PK
+        Long trip_id FK
+        Instant recordedAt
+        Double speedKmh
+        Integer rpm
+        Double engineTempC
+        Double fuelLevelPct
+        Double lat
+        Double lng
+        Instant createdAt
+    }
+
+    DtcCode {
+        Long id PK
+        String code UK
+        String description
+        Instant createdAt
+    }
 ```
 
 - **User** (1) ─ owns → (N) **Vehicle** — authenticates via JWT; `USER`/`ADMIN` role
