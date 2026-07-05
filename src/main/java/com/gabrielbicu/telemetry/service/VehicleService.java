@@ -1,0 +1,76 @@
+package com.gabrielbicu.telemetry.service;
+
+import com.gabrielbicu.telemetry.domain.User;
+import com.gabrielbicu.telemetry.domain.Vehicle;
+import com.gabrielbicu.telemetry.dto.CreateVehicleRequest;
+import com.gabrielbicu.telemetry.dto.VehicleResponse;
+import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
+import com.gabrielbicu.telemetry.mapper.VehicleMapper;
+import com.gabrielbicu.telemetry.repository.UserRepository;
+import com.gabrielbicu.telemetry.repository.VehicleRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Business logic for {@link Vehicle}.
+ *
+ * <p>Every method takes a {@code userId} so that operations are scoped to the
+ * caller. This is the (temporary) Week 3 stand-in for real authentication: the
+ * id comes from the {@code X-User-Id} request header. Once JWT lands in Week 4,
+ * the controller will extract the id from the token instead of a header — the
+ * service contract stays the same.
+ *
+ * <p>Ownership is enforced <em>in the query</em> where possible, using
+ * {@link com.gabrielbicu.telemetry.repository.VehicleRepository#findByIdAndUserId}.
+ * That method returns an empty {@link java.util.Optional} when the row exists but
+ * belongs to someone else, so "not found" and "not yours" collapse into the same
+ * 404 — there's no information leak about which vehicle ids exist.
+ */
+@Service
+public class VehicleService {
+
+    private final VehicleRepository vehicleRepository;
+    private final UserRepository userRepository;
+    private final VehicleMapper vehicleMapper;
+
+    public VehicleService(VehicleRepository vehicleRepository,
+                          UserRepository userRepository,
+                          VehicleMapper vehicleMapper) {
+        this.vehicleRepository = vehicleRepository;
+        this.userRepository = userRepository;
+        this.vehicleMapper = vehicleMapper;
+    }
+
+    @Transactional
+    public VehicleResponse createVehicle(CreateVehicleRequest request, Long userId) {
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User", userId));
+        Vehicle vehicle = vehicleMapper.toEntity(request);
+        vehicleMapper.populateUser(owner, vehicle);
+        Vehicle saved = vehicleRepository.save(vehicle);
+        return vehicleMapper.toResponse(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleResponse> listVehicles(Long userId) {
+        return vehicleRepository.findByUserId(userId).stream()
+                .map(vehicleMapper::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public VehicleResponse getVehicle(Long id, Long userId) {
+        return vehicleRepository.findByIdAndUserId(id, userId)
+                .map(vehicleMapper::toResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle", id));
+    }
+
+    @Transactional
+    public void deleteVehicle(Long id, Long userId) {
+        Vehicle vehicle = vehicleRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle", id));
+        vehicleRepository.delete(vehicle);
+    }
+}
