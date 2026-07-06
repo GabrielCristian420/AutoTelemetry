@@ -4,10 +4,8 @@ import com.gabrielbicu.telemetry.domain.User;
 import com.gabrielbicu.telemetry.domain.Vehicle;
 import com.gabrielbicu.telemetry.dto.CreateVehicleRequest;
 import com.gabrielbicu.telemetry.dto.VehicleResponse;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 /**
  * Maps between the {@link Vehicle} entity and its DTOs.
@@ -41,12 +39,13 @@ public interface VehicleMapper {
     VehicleResponse toResponse(Vehicle vehicle);
 
     /**
-     * Stamps the owning user onto a freshly-mapped entity. Called by the service
-     * after {@link #toEntity(CreateVehicleRequest)}, because the user is resolved
-     * from the request header ({@code X-User-Id}), not from the request body.
+     * Stamps the owning user onto a freshly-mapped entity. Called manually by
+     * the service after {@link #toEntity(CreateVehicleRequest)}, because the
+     * owning user is resolved from the request header ({@code X-User-Id}), not
+     * from the request body — so it cannot be wired through {@code @AfterMapping}
+     * (which would need {@code User} as an extra parameter of {@code toEntity}).
      */
-    @AfterMapping
-    default void populateUser(User user, @MappingTarget Vehicle vehicle) {
+    default void populateUser(User user, Vehicle vehicle) {
         vehicle.setUser(user);
     }
 }

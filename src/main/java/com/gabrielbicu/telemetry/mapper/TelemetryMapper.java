@@ -5,10 +5,8 @@ import com.gabrielbicu.telemetry.domain.TelemetryReading;
 import com.gabrielbicu.telemetry.domain.Trip;
 import com.gabrielbicu.telemetry.dto.TelemetryReadingRequest;
 import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.util.List;
@@ -49,8 +47,15 @@ public interface TelemetryMapper {
     @Mapping(target = "dtcCodes", source = "dtcCodes", qualifiedByName = "dtcCodesToStrings")
     TelemetryReadingResponse toResponse(TelemetryReading reading);
 
-    @AfterMapping
-    default void populateTrip(Trip trip, @MappingTarget TelemetryReading reading) {
+    /**
+     * Stamps the owning trip onto a freshly-mapped reading. Called manually by
+     * the service after {@link #toEntity(TelemetryReadingRequest)}: the trip is
+     * resolved (with ownership checks) inside the service, not through
+     * {@code @AfterMapping} which would need {@code Trip} as an extra parameter
+     * of {@code toEntity}. See {@link com.gabrielbicu.telemetry.mapper.VehicleMapper#populateUser}
+     * for the same pattern.
+     */
+    default void populateTrip(Trip trip, TelemetryReading reading) {
         reading.setTrip(trip);
     }
 

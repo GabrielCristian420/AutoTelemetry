@@ -4,6 +4,7 @@ import com.gabrielbicu.telemetry.domain.Trip;
 import com.gabrielbicu.telemetry.domain.Vehicle;
 import com.gabrielbicu.telemetry.dto.StartTripRequest;
 import com.gabrielbicu.telemetry.dto.TripResponse;
+import com.gabrielbicu.telemetry.exception.BusinessRuleException;
 import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
 import com.gabrielbicu.telemetry.mapper.TripMapper;
 import com.gabrielbicu.telemetry.repository.TripRepository;
@@ -74,6 +75,14 @@ public class TripService {
         Long vehicleId = trip.getVehicle().getId();
         vehicleRepository.findByIdAndUserId(vehicleId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle", vehicleId));
+
+        // Reject ending a trip twice: a second POST /api/trips/{id}/end would
+        // otherwise silently overwrite endedAt and corrupt any downstream stats
+        // that use (endedAt - startedAt). Mapped to 409 by GlobalExceptionHandler
+        // (Week 4); today it bubbles up as a 500.
+        if (trip.getEndedAt() != null) {
+            throw new BusinessRuleException("Trip " + tripId + " is already ended");
+        }
 
         trip.setEndedAt(Instant.now());
         Trip saved = tripRepository.save(trip);

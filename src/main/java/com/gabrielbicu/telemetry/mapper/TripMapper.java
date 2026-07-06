@@ -4,10 +4,8 @@ import com.gabrielbicu.telemetry.domain.Trip;
 import com.gabrielbicu.telemetry.domain.Vehicle;
 import com.gabrielbicu.telemetry.dto.StartTripRequest;
 import com.gabrielbicu.telemetry.dto.TripResponse;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 /**
  * Maps between the {@link Trip} entity and its DTOs.
@@ -34,8 +32,15 @@ public interface TripMapper {
     @Mapping(target = "vehicleId", source = "vehicle.id")
     TripResponse toResponse(Trip trip);
 
-    @AfterMapping
-    default void populateVehicle(Vehicle vehicle, @MappingTarget Trip trip) {
+    /**
+     * Stamps the owning vehicle onto a freshly-mapped trip. Called manually by
+     * the service after {@link #toEntity(StartTripRequest)}, because the owning
+     * vehicle is resolved (with ownership checks) inside the service, not
+     * available as an extra parameter of {@code toEntity} — so it can't be wired
+     * through {@code @AfterMapping}. See {@link com.gabrielbicu.telemetry.mapper.VehicleMapper#populateUser}
+     * for the same pattern.
+     */
+    default void populateVehicle(Vehicle vehicle, Trip trip) {
         trip.setVehicle(vehicle);
     }
 }
