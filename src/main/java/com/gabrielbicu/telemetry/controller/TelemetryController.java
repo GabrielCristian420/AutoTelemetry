@@ -5,9 +5,9 @@ import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
 import com.gabrielbicu.telemetry.service.TelemetryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,6 +22,9 @@ import java.net.URI;
  * synchronous (DB write blocks the response). Week 6's stretch goal decouples
  * this with a Kafka producer so the endpoint can ack immediately and a consumer
  * persists asynchronously.
+ *
+ * <p>Caller identity is resolved from the JWT via Spring Security; unauthenticated
+ * requests are rejected with 401 before reaching this controller.
  */
 @RestController
 @RequestMapping("/api/telemetry")
@@ -36,7 +39,7 @@ public class TelemetryController {
     @PostMapping
     public ResponseEntity<TelemetryReadingResponse> ingestReading(
             @Valid @RequestBody TelemetryReadingRequest request,
-            @RequestHeader("X-User-Id") Long userId) {
+            @AuthenticationPrincipal Long userId) {
         TelemetryReadingResponse saved = telemetryService.ingestReading(request, userId);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
