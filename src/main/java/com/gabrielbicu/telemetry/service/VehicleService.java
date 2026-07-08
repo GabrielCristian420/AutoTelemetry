@@ -4,8 +4,11 @@ import com.gabrielbicu.telemetry.domain.User;
 import com.gabrielbicu.telemetry.domain.Vehicle;
 import com.gabrielbicu.telemetry.dto.CreateVehicleRequest;
 import com.gabrielbicu.telemetry.dto.VehicleResponse;
+import com.gabrielbicu.telemetry.dto.VehicleStatsProjection;
+import com.gabrielbicu.telemetry.dto.VehicleStatsResponse;
 import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
 import com.gabrielbicu.telemetry.mapper.VehicleMapper;
+import com.gabrielbicu.telemetry.repository.TelemetryReadingRepository;
 import com.gabrielbicu.telemetry.repository.UserRepository;
 import com.gabrielbicu.telemetry.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
@@ -33,13 +36,16 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final TelemetryReadingRepository readingRepository;
     private final VehicleMapper vehicleMapper;
 
     public VehicleService(VehicleRepository vehicleRepository,
                           UserRepository userRepository,
+                          TelemetryReadingRepository readingRepository,
                           VehicleMapper vehicleMapper) {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
+        this.readingRepository = readingRepository;
         this.vehicleMapper = vehicleMapper;
     }
 
@@ -72,5 +78,20 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle", id));
         vehicleRepository.delete(vehicle);
+    }
+
+    @Transactional(readOnly = true)
+    public VehicleStatsResponse getVehicleStats(Long vehicleId, Long userId) {
+        vehicleRepository.findByIdAndUserId(vehicleId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle", vehicleId));
+
+        VehicleStatsProjection projection = readingRepository.findStatsByVehicleId(vehicleId);
+
+        return VehicleStatsResponse.builder()
+                .avgSpeedKmh(projection.getAvgSpeedKmh() != null ? projection.getAvgSpeedKmh() : 0.0)
+                .maxRpm(projection.getMaxRpm() != null ? projection.getMaxRpm() : 0)
+                .totalFuelConsumed(projection.getTotalFuelConsumed() != null ? projection.getTotalFuelConsumed() : 0.0)
+                .activeDtcCount(projection.getActiveDtcCount() != null ? projection.getActiveDtcCount() : 0L)
+                .build();
     }
 }

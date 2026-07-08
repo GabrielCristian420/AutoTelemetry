@@ -1,9 +1,12 @@
 package com.gabrielbicu.telemetry.repository;
 
 import com.gabrielbicu.telemetry.domain.TelemetryReading;
+import com.gabrielbicu.telemetry.dto.VehicleStatsProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,4 +22,45 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
      * also returned so clients can render pagination controls.
      */
     Page<TelemetryReading> findByTripIdOrderByRecordedAtAsc(Long tripId, Pageable pageable);
+
+    @Query(value = """
+            WITH vehicle_readings AS (
+                SELECT 
+                    r.speed_kmh,
+                    r.rpm,
+                    r.fuel_level_pct,
+                    r.trip_id,
+                    r.recorded_at
+                FROM telemetry_readings r
+                JOIN trips t ON r.trip_id = t.id
+                WHERE t.vehicle_id = :vehicleId
+            ),
+            fuel_consumed_calc AS (
+                SELECT 
+                    COALESCE(SUM(diff), 0.0) as total_fuel
+                FROM (
+                    SELECT 
+                        fuel_level_pct - LEAD(fuel_level_pct) OVER (PARTITION BY trip_id ORDER BY recorded_at ASC) as diff
+                    FROM vehicle_readings
+                ) d
+                WHERE diff > 0
+            ),
+            active_dtcs AS (
+                SELECT 
+                    COUNT(DISTINCT rd.dtc_code_id) as dtc_count
+                FROM reading_dtc_codes rd
+                JOIN telemetry_readings r ON rd.reading_id = r.id
+                JOIN trips t ON r.trip_id = t.id
+                WHERE t.vehicle_id = :vehicleId
+            )
+            SELECT 
+                COALESCE(AVG(vr.speed_kmh), 0.0) as avg_speed_kmh,
+                COALESCE(MAX(vr.rpm), 0) as max_rpm,
+                COALESCE((SELECT total_fuel FROM fuel_consumed_calc), 0.0) as total_fuel_consumed,
+                COALESCE((SELECT dtc_count FROM active_dtcs), 0) as active_dtc_count
+            FROM (SELECT 1) dummy
+            LEFT JOIN vehicle_readings vr ON TRUE
+            GROUP BY dummy.1
+            """, nativeQuery = true)
+    VehicleStatsProjection findStatsByVehicleId(@Param("vehicleId") Long vehicleId);
 }
