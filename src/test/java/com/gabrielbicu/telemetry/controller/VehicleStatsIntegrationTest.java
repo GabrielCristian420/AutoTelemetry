@@ -128,4 +128,15 @@ class VehicleStatsIntegrationTest {
                 .andExpect(jsonPath("$.totalFuelConsumed", is(2.0)))
                 .andExpect(jsonPath("$.activeDtcCount", is(0)));
     }
+
+    @Test
+    void getVehicleStats_withNoReadings_returnsAllZeros() throws Exception {
+        mockMvc.perform(get("/api/vehicles/{id}/stats", testVehicleId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.avgSpeedKmh", is(0.0)))
+                .andExpect(jsonPath("$.maxRpm", is(0)))
+                .andExpect(jsonPath("$.totalFuelConsumed", is(0.0)))
+                .andExpect(jsonPath("$.activeDtcCount", is(0)));
+    }
 }
