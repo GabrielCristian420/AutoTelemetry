@@ -58,9 +58,7 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
                 COALESCE(MAX(vr.rpm), 0) as max_rpm,
                 COALESCE((SELECT total_fuel FROM fuel_consumed_calc), 0.0) as total_fuel_consumed,
                 COALESCE((SELECT dtc_count FROM active_dtcs), 0) as active_dtc_count
-            FROM (SELECT 1) dummy
-            LEFT JOIN vehicle_readings vr ON TRUE
-            GROUP BY dummy.1
+            FROM vehicle_readings vr
             """, nativeQuery = true)
     VehicleStatsProjection findStatsByVehicleId(@Param("vehicleId") Long vehicleId);
 }
