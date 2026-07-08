@@ -1,7 +1,10 @@
 package com.gabrielbicu.telemetry.dto;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,10 +41,19 @@ public class TelemetryReadingRequest {
     @NotNull
     private Instant recordedAt;
 
+    @DecimalMin(value = "0.0", inclusive = true)
     private Double speedKmh;
+
+    @Positive
     private Integer rpm;
+
+    @DecimalMin(value = "-40.0", inclusive = true)
     private Double engineTempC;
+
+    @DecimalMin(value = "0.0", inclusive = true)
+    @DecimalMax(value = "100.0", inclusive = true)
     private Double fuelLevelPct;
+
     private Double lat;
     private Double lng;
 
