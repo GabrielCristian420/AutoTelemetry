@@ -3,12 +3,17 @@ package com.gabrielbicu.telemetry.service;
 import com.gabrielbicu.telemetry.domain.Trip;
 import com.gabrielbicu.telemetry.domain.Vehicle;
 import com.gabrielbicu.telemetry.dto.StartTripRequest;
+import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.exception.BusinessRuleException;
 import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
+import com.gabrielbicu.telemetry.mapper.TelemetryMapper;
 import com.gabrielbicu.telemetry.mapper.TripMapper;
+import com.gabrielbicu.telemetry.repository.TelemetryReadingRepository;
 import com.gabrielbicu.telemetry.repository.TripRepository;
 import com.gabrielbicu.telemetry.repository.VehicleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,14 +43,20 @@ public class TripService {
 
     private final TripRepository tripRepository;
     private final VehicleRepository vehicleRepository;
+    private final TelemetryReadingRepository readingRepository;
     private final TripMapper tripMapper;
+    private final TelemetryMapper telemetryMapper;
 
     public TripService(TripRepository tripRepository,
                        VehicleRepository vehicleRepository,
-                       TripMapper tripMapper) {
+                       TelemetryReadingRepository readingRepository,
+                       TripMapper tripMapper,
+                       TelemetryMapper telemetryMapper) {
         this.tripRepository = tripRepository;
         this.vehicleRepository = vehicleRepository;
+        this.readingRepository = readingRepository;
         this.tripMapper = tripMapper;
+        this.telemetryMapper = telemetryMapper;
     }
 
     @Transactional
@@ -98,5 +109,19 @@ public class TripService {
         return tripRepository.findByVehicleId(vehicleId).stream()
                 .map(tripMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TelemetryReadingResponse> getReadingsForTrip(Long tripId, Pageable pageable, Long userId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new EntityNotFoundException("Trip", tripId));
+
+        // Ownership check: walk up trip -> vehicle -> user
+        Long vehicleId = trip.getVehicle().getId();
+        vehicleRepository.findByIdAndUserId(vehicleId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle", vehicleId));
+
+        return readingRepository.findByTripIdOrderByRecordedAtAsc(tripId, pageable)
+                .map(telemetryMapper::toResponse);
     }
 }

@@ -2,11 +2,15 @@ package com.gabrielbicu.telemetry.service;
 
 import com.gabrielbicu.telemetry.domain.Trip;
 import com.gabrielbicu.telemetry.domain.Vehicle;
+import com.gabrielbicu.telemetry.domain.TelemetryReading;
+import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
 import com.gabrielbicu.telemetry.dto.StartTripRequest;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.exception.BusinessRuleException;
 import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
+import com.gabrielbicu.telemetry.mapper.TelemetryMapper;
 import com.gabrielbicu.telemetry.mapper.TripMapper;
+import com.gabrielbicu.telemetry.repository.TelemetryReadingRepository;
 import com.gabrielbicu.telemetry.repository.TripRepository;
 import com.gabrielbicu.telemetry.repository.VehicleRepository;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.List;
@@ -37,7 +44,9 @@ class TripServiceTest {
 
     @Mock private TripRepository tripRepository;
     @Mock private VehicleRepository vehicleRepository;
+    @Mock private TelemetryReadingRepository readingRepository;
     @Mock private TripMapper tripMapper;
+    @Mock private TelemetryMapper telemetryMapper;
 
     @InjectMocks private TripService tripService;
 
@@ -211,5 +220,69 @@ class TripServiceTest {
         when(vehicleRepository.findByIdAndUserId(vehicleId, userId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> tripService.listTripsForVehicle(vehicleId, userId));
+    }
+
+    @Test
+    void getReadingsForTrip_success() {
+        Long userId = 1L;
+        Long tripId = 100L;
+        Long vehicleId = 10L;
+
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(vehicleId);
+
+        Trip trip = new Trip();
+        trip.setId(tripId);
+        trip.setVehicle(vehicle);
+
+        TelemetryReading reading = new TelemetryReading();
+        reading.setId(500L);
+
+        Pageable pageable = Pageable.ofSize(10);
+        Page<TelemetryReading> readingPage = new PageImpl<>(List.of(reading), pageable, 1);
+
+        when(tripRepository.findById(tripId)).thenReturn(Optional.of(trip));
+        when(vehicleRepository.findByIdAndUserId(vehicleId, userId)).thenReturn(Optional.of(vehicle));
+        when(readingRepository.findByTripIdOrderByRecordedAtAsc(tripId, pageable)).thenReturn(readingPage);
+        when(telemetryMapper.toResponse(reading)).thenReturn(TelemetryReadingResponse.builder().id(500L).build());
+
+        Page<TelemetryReadingResponse> response = tripService.getReadingsForTrip(tripId, pageable, userId);
+
+        assertNotNull(response);
+        assertEquals(1, response.getTotalElements());
+        assertEquals(500L, response.getContent().get(0).getId());
+        verify(readingRepository).findByTripIdOrderByRecordedAtAsc(tripId, pageable);
+    }
+
+    @Test
+    void getReadingsForTrip_throwsWhenTripNotFound() {
+        Long userId = 1L;
+        Long tripId = 999L;
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(tripRepository.findById(tripId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> tripService.getReadingsForTrip(tripId, pageable, userId));
+    }
+
+    @Test
+    void getReadingsForTrip_throwsWhenVehicleNotOwned() {
+        Long userId = 1L;
+        Long tripId = 100L;
+        Long vehicleId = 10L;
+
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(vehicleId);
+
+        Trip trip = new Trip();
+        trip.setId(tripId);
+        trip.setVehicle(vehicle);
+
+        Pageable pageable = Pageable.ofSize(10);
+
+        when(tripRepository.findById(tripId)).thenReturn(Optional.of(trip));
+        when(vehicleRepository.findByIdAndUserId(vehicleId, userId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> tripService.getReadingsForTrip(tripId, pageable, userId));
     }
 }

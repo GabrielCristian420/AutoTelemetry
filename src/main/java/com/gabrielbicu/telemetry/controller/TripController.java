@@ -1,11 +1,15 @@
 package com.gabrielbicu.telemetry.controller;
 
 import com.gabrielbicu.telemetry.dto.StartTripRequest;
+import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.service.TripService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,5 +57,13 @@ public class TripController {
     public TripResponse endTrip(@PathVariable Long id,
                                  @AuthenticationPrincipal Long userId) {
         return tripService.endTrip(id, userId);
+    }
+
+    @GetMapping("/{id}/readings")
+    public Page<TelemetryReadingResponse> getReadingsForTrip(
+            @PathVariable Long id,
+            Pageable pageable,
+            @AuthenticationPrincipal Long userId) {
+        return tripService.getReadingsForTrip(id, pageable, userId);
     }
 }
