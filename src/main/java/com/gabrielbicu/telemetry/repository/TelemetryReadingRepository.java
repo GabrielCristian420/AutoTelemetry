@@ -26,6 +26,7 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
     @Query(value = """
             WITH vehicle_readings AS (
                 SELECT 
+                    r.id,
                     r.speed_kmh,
                     r.rpm,
                     r.fuel_level_pct,
@@ -35,28 +36,26 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
                 JOIN trips t ON r.trip_id = t.id
                 WHERE t.vehicle_id = :vehicleId
             ),
-            fuel_consumed_calc AS (
+            fuel_drop_calc AS (
                 SELECT 
-                    COALESCE(SUM(diff), 0.0) as total_fuel
+                    COALESCE(SUM(drop_amount), 0.0) as total_fuel_drop
                 FROM (
                     SELECT 
-                        fuel_level_pct - LEAD(fuel_level_pct) OVER (PARTITION BY trip_id ORDER BY recorded_at ASC) as diff
+                        fuel_level_pct - LEAD(fuel_level_pct) OVER (PARTITION BY trip_id ORDER BY recorded_at ASC) as drop_amount
                     FROM vehicle_readings
                 ) d
-                WHERE diff > 0
+                WHERE drop_amount > 0
             ),
             active_dtcs AS (
                 SELECT 
                     COUNT(DISTINCT rd.dtc_code_id) as dtc_count
                 FROM reading_dtc_codes rd
-                JOIN telemetry_readings r ON rd.reading_id = r.id
-                JOIN trips t ON r.trip_id = t.id
-                WHERE t.vehicle_id = :vehicleId
+                JOIN vehicle_readings vr ON rd.reading_id = vr.id
             )
             SELECT 
                 COALESCE(AVG(vr.speed_kmh), 0.0) as avg_speed_kmh,
                 COALESCE(MAX(vr.rpm), 0) as max_rpm,
-                COALESCE((SELECT total_fuel FROM fuel_consumed_calc), 0.0) as total_fuel_consumed,
+                COALESCE((SELECT total_fuel_drop FROM fuel_drop_calc), 0.0) as total_fuel_drop_pct,
                 COALESCE((SELECT dtc_count FROM active_dtcs), 0) as active_dtc_count
             FROM vehicle_readings vr
             """, nativeQuery = true)

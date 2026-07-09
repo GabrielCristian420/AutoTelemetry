@@ -125,7 +125,7 @@ class VehicleStatsIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.avgSpeedKmh", is(65.0)))
                 .andExpect(jsonPath("$.maxRpm", is(3500)))
-                .andExpect(jsonPath("$.totalFuelConsumed", is(2.0)))
+                .andExpect(jsonPath("$.totalFuelDropPct", is(2.0)))
                 .andExpect(jsonPath("$.activeDtcCount", is(0)));
     }
 
@@ -136,7 +136,50 @@ class VehicleStatsIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.avgSpeedKmh", is(0.0)))
                 .andExpect(jsonPath("$.maxRpm", is(0)))
-                .andExpect(jsonPath("$.totalFuelConsumed", is(0.0)))
+                .andExpect(jsonPath("$.totalFuelDropPct", is(0.0)))
                 .andExpect(jsonPath("$.activeDtcCount", is(0)));
+    }
+
+    @Test
+    void getReadingsForTrip_returnsPaginatedReadings() throws Exception {
+        Trip trip = new Trip();
+        trip.setVehicle(vehicleRepository.findById(testVehicleId).orElseThrow());
+        trip.setStartedAt(Instant.now().minusSeconds(3600));
+        Trip savedTrip = tripRepository.save(trip);
+
+        TelemetryReading reading1 = new TelemetryReading();
+        reading1.setTrip(savedTrip);
+        reading1.setRecordedAt(Instant.now().minusSeconds(30));
+        reading1.setSpeedKmh(50.0);
+        reading1.setRpm(2500);
+        reading1.setFuelLevelPct(90.0);
+        readingRepository.save(reading1);
+
+        TelemetryReading reading2 = new TelemetryReading();
+        reading2.setTrip(savedTrip);
+        reading2.setRecordedAt(Instant.now().minusSeconds(20));
+        reading2.setSpeedKmh(60.0);
+        reading2.setRpm(3000);
+        reading2.setFuelLevelPct(89.0);
+        readingRepository.save(reading2);
+
+        TelemetryReading reading3 = new TelemetryReading();
+        reading3.setTrip(savedTrip);
+        reading3.setRecordedAt(Instant.now().minusSeconds(10));
+        reading3.setSpeedKmh(70.0);
+        reading3.setRpm(3500);
+        reading3.setFuelLevelPct(88.0);
+        readingRepository.save(reading3);
+
+        mockMvc.perform(get("/api/trips/{id}/readings", savedTrip.getId())
+                        .param("page", "0")
+                        .param("size", "2")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()", is(2)))
+                .andExpect(jsonPath("$.totalElements", is(3)))
+                .andExpect(jsonPath("$.totalPages", is(2)))
+                .andExpect(jsonPath("$.content[0].speedKmh", is(50.0)))
+                .andExpect(jsonPath("$.content[1].speedKmh", is(60.0)));
     }
 }

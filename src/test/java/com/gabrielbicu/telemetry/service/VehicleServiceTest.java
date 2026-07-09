@@ -124,7 +124,7 @@ class VehicleServiceTest {
         VehicleStatsProjection projection = new VehicleStatsProjection() {
             @Override public Double getAvgSpeedKmh() { return 65.5; }
             @Override public Integer getMaxRpm() { return 3500; }
-            @Override public Double getTotalFuelConsumed() { return 12.3; }
+            @Override public Double getTotalFuelDropPct() { return 12.3; }
             @Override public Long getActiveDtcCount() { return 2L; }
         };
 
@@ -135,7 +135,7 @@ class VehicleServiceTest {
 
         assertEquals(65.5, response.getAvgSpeedKmh());
         assertEquals(3500, response.getMaxRpm());
-        assertEquals(12.3, response.getTotalFuelConsumed());
+        assertEquals(12.3, response.getTotalFuelDropPct());
         assertEquals(2L, response.getActiveDtcCount());
     }
 
