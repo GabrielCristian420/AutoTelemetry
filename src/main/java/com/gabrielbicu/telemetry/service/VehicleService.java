@@ -54,6 +54,7 @@ public class VehicleService {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User", userId));
         Vehicle vehicle = vehicleMapper.toEntity(request);
+        vehicle.setVin(request.getVin().toUpperCase());
         vehicleMapper.populateUser(owner, vehicle);
         Vehicle saved = vehicleRepository.save(vehicle);
         return vehicleMapper.toResponse(saved);
@@ -86,11 +87,21 @@ public class VehicleService {
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle", vehicleId));
 
         VehicleStatsProjection projection = readingRepository.findStatsByVehicleId(vehicleId);
+        if (projection == null) {
+            // No readings for this vehicle yet — return a zeroed-out stats object
+            // instead of risking an NPE on the projection access below.
+            return VehicleStatsResponse.builder()
+                    .avgSpeedKmh(0.0)
+                    .maxRpm(0)
+                    .totalFuelDropPct(0.0)
+                    .activeDtcCount(0L)
+                    .build();
+        }
 
         return VehicleStatsResponse.builder()
                 .avgSpeedKmh(projection.getAvgSpeedKmh() != null ? projection.getAvgSpeedKmh() : 0.0)
                 .maxRpm(projection.getMaxRpm() != null ? projection.getMaxRpm() : 0)
-                .totalFuelConsumed(projection.getTotalFuelConsumed() != null ? projection.getTotalFuelConsumed() : 0.0)
+                .totalFuelDropPct(projection.getTotalFuelDropPct() != null ? projection.getTotalFuelDropPct() : 0.0)
                 .activeDtcCount(projection.getActiveDtcCount() != null ? projection.getActiveDtcCount() : 0L)
                 .build();
     }
