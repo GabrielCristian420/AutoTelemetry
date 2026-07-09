@@ -3,6 +3,7 @@ package com.gabrielbicu.telemetry.controller;
 import com.gabrielbicu.telemetry.dto.CreateVehicleRequest;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.dto.VehicleResponse;
+import com.gabrielbicu.telemetry.dto.VehicleStatsResponse;
 import com.gabrielbicu.telemetry.service.TripService;
 import com.gabrielbicu.telemetry.service.VehicleService;
 import jakarta.validation.Valid;
@@ -77,5 +78,11 @@ public class VehicleController {
     public List<TripResponse> listTripsForVehicle(@PathVariable Long id,
                                                   @AuthenticationPrincipal Long userId) {
         return tripService.listTripsForVehicle(id, userId);
+    }
+
+    @GetMapping("/{id}/stats")
+    public VehicleStatsResponse getVehicleStats(@PathVariable Long id,
+                                                 @AuthenticationPrincipal Long userId) {
+        return vehicleService.getVehicleStats(id, userId);
     }
 }
