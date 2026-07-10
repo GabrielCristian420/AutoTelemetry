@@ -25,12 +25,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Instant;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@EnableAutoConfiguration(exclude = {
+        KafkaAutoConfiguration.class
+})
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)
 class VehicleStatsIntegrationTest {
