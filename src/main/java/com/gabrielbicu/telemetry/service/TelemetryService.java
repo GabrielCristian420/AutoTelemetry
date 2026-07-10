@@ -110,9 +110,9 @@ public class TelemetryService {
             return new HashSet<>();
         }
 
-        // De-duplicate the incoming list (codes are unique per reading).
+        // De-duplicate and normalize the incoming list (codes are unique per reading).
         Set<String> distinctCodes = codeStrings.stream()
-                .map(String::trim)
+                .map(s -> s.trim().toUpperCase())
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.toSet());
 

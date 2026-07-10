@@ -56,6 +56,8 @@ class DtcDecoderServiceTest {
         assertFalse(decoder.decode("XYZ").isPresent());
         assertFalse(decoder.decode("P030").isPresent());      // too short
         assertFalse(decoder.decode("P03010").isPresent());    // too long
+        assertFalse(decoder.decode("P4000").isPresent());     // invalid digit 4 in position 2
+        assertFalse(decoder.decode("P9301").isPresent());     // invalid digit 9 in position 2
         assertFalse(decoder.decode(null).isPresent());
         assertFalse(decoder.decode("  ").isPresent());
     }
