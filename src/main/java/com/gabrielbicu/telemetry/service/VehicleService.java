@@ -81,6 +81,18 @@ public class VehicleService {
         vehicleRepository.delete(vehicle);
     }
 
+    /**
+     * Lightweight ownership assertion used by endpoints that don't need the
+     * full vehicle payload (e.g. the live buffer view). Throws
+     * {@link EntityNotFoundException} if the vehicle doesn't exist or isn't
+     * owned by the caller — same 404 semantics as the other methods.
+     */
+    @Transactional(readOnly = true)
+    public void requireOwnership(Long vehicleId, Long userId) {
+        vehicleRepository.findByIdAndUserId(vehicleId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle", vehicleId));
+    }
+
     @Transactional(readOnly = true)
     public VehicleStatsResponse getVehicleStats(Long vehicleId, Long userId) {
         vehicleRepository.findByIdAndUserId(vehicleId, userId)

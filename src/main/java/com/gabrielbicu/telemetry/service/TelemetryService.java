@@ -11,6 +11,9 @@ import com.gabrielbicu.telemetry.repository.DtcCodeRepository;
 import com.gabrielbicu.telemetry.repository.TelemetryReadingRepository;
 import com.gabrielbicu.telemetry.repository.TripRepository;
 import com.gabrielbicu.telemetry.repository.VehicleRepository;
+import com.gabrielbicu.telemetry.service.DtcDecoderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,22 +43,30 @@ import java.util.stream.Collectors;
 @Service
 public class TelemetryService {
 
+    private static final Logger log = LoggerFactory.getLogger(TelemetryService.class);
+
     private final TelemetryReadingRepository readingRepository;
     private final TripRepository tripRepository;
     private final VehicleRepository vehicleRepository;
     private final DtcCodeRepository dtcCodeRepository;
     private final TelemetryMapper telemetryMapper;
+    private final DtcDecoderService dtcDecoderService;
+    private final TelemetryEventProducer eventProducer;
 
     public TelemetryService(TelemetryReadingRepository readingRepository,
                             TripRepository tripRepository,
                             VehicleRepository vehicleRepository,
                             DtcCodeRepository dtcCodeRepository,
-                            TelemetryMapper telemetryMapper) {
+                            TelemetryMapper telemetryMapper,
+                            DtcDecoderService dtcDecoderService,
+                            TelemetryEventProducer eventProducer) {
         this.readingRepository = readingRepository;
         this.tripRepository = tripRepository;
         this.vehicleRepository = vehicleRepository;
         this.dtcCodeRepository = dtcCodeRepository;
         this.telemetryMapper = telemetryMapper;
+        this.dtcDecoderService = dtcDecoderService;
+        this.eventProducer = eventProducer;
     }
 
     @Transactional
@@ -75,6 +86,17 @@ public class TelemetryService {
         reading.getDtcCodes().addAll(codes);
 
         TelemetryReading saved = readingRepository.save(reading);
+
+        // Decouple downstream processing (live buffer, analytics) from the
+        // request path: fire-and-forget the reading to Kafka. If the broker is
+        // down the producer logs and moves on — ingestion stays synchronous
+        // and reliable regardless of Kafka's availability.
+        try {
+            eventProducer.publishReading(saved, vehicleId, userId);
+        } catch (Exception e) {
+            log.error("Failed to publish telemetry reading event to Kafka for reading {}: {}", saved.getId(), e.getMessage());
+        }
+
         return telemetryMapper.toResponse(saved);
     }
 
@@ -88,9 +110,9 @@ public class TelemetryService {
             return new HashSet<>();
         }
 
-        // De-duplicate the incoming list (codes are unique per reading).
+        // De-duplicate and normalize the incoming list (codes are unique per reading).
         Set<String> distinctCodes = codeStrings.stream()
-                .map(String::trim)
+                .map(s -> s.trim().toUpperCase())
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.toSet());
 
@@ -106,7 +128,10 @@ public class TelemetryService {
     private DtcCode persistUnknownCode(String code) {
         DtcCode newCode = new DtcCode();
         newCode.setCode(code);
-        newCode.setDescription("Unknown OBD-II code (auto-created on ingestion)");
+        // Translate the raw code into a human-readable description when we can;
+        // fall back to a generic placeholder if the code is malformed.
+        newCode.setDescription(dtcDecoderService.decode(code)
+                .orElse("Unknown OBD-II code (auto-created on ingestion)"));
         return dtcCodeRepository.save(newCode);
     }
 }

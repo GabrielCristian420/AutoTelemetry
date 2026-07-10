@@ -21,7 +21,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.time.Instant;
+
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,6 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@EnableAutoConfiguration(exclude = {
+        KafkaAutoConfiguration.class
+})
 @AutoConfigureMockMvc
 @Testcontainers(disabledWithoutDocker = true)
 class VehicleStatsIntegrationTest {
@@ -49,6 +57,12 @@ class VehicleStatsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private com.gabrielbicu.telemetry.service.TelemetryEventProducer telemetryEventProducer;
+
+    @MockBean
+    private com.gabrielbicu.telemetry.service.TelemetryEventConsumer telemetryEventConsumer;
 
     @Autowired
     private UserRepository userRepository;

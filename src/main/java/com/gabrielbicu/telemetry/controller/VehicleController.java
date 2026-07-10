@@ -1,9 +1,11 @@
 package com.gabrielbicu.telemetry.controller;
 
 import com.gabrielbicu.telemetry.dto.CreateVehicleRequest;
+import com.gabrielbicu.telemetry.dto.LiveTelemetryResponse;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.dto.VehicleResponse;
 import com.gabrielbicu.telemetry.dto.VehicleStatsResponse;
+import com.gabrielbicu.telemetry.service.LiveTelemetryService;
 import com.gabrielbicu.telemetry.service.TripService;
 import com.gabrielbicu.telemetry.service.VehicleService;
 import jakarta.validation.Valid;
@@ -37,10 +39,14 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
     private final TripService tripService;
+    private final LiveTelemetryService liveTelemetryService;
 
-    public VehicleController(VehicleService vehicleService, TripService tripService) {
+    public VehicleController(VehicleService vehicleService,
+                             TripService tripService,
+                             LiveTelemetryService liveTelemetryService) {
         this.vehicleService = vehicleService;
         this.tripService = tripService;
+        this.liveTelemetryService = liveTelemetryService;
     }
 
     @PostMapping
@@ -84,5 +90,24 @@ public class VehicleController {
     public VehicleStatsResponse getVehicleStats(@PathVariable Long id,
                                                  @AuthenticationPrincipal Long userId) {
         return vehicleService.getVehicleStats(id, userId);
+    }
+
+    /**
+     * Sub-resource: live (in-memory) window of recent readings for a vehicle.
+     *
+     * <p>Unlike {@code /stats} (which aggregates from Postgres), this reads the
+     * ephemeral buffer maintained by the Kafka consumer — it's the CQRS "read
+     * model" fed asynchronously from the ingestion stream. Ownership is checked
+     * up front so a caller can't read another user's live data.
+     */
+    @GetMapping("/{id}/live")
+    public List<LiveTelemetryResponse> getLiveTelemetry(@PathVariable Long id,
+                                                        @AuthenticationPrincipal Long userId) {
+        vehicleService.requireOwnership(id, userId);
+        return liveTelemetryService.getRecent(id).stream()
+                .map(e -> new LiveTelemetryResponse(
+                        e.readingId(), e.tripId(), e.vehicleId(), e.recordedAt(),
+                        e.speedKmh(), e.rpm(), e.engineTempC(), e.fuelLevelPct(), e.dtcCodes()))
+                .toList();
     }
 }
