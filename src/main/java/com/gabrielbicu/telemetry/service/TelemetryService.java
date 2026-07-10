@@ -12,6 +12,8 @@ import com.gabrielbicu.telemetry.repository.TelemetryReadingRepository;
 import com.gabrielbicu.telemetry.repository.TripRepository;
 import com.gabrielbicu.telemetry.repository.VehicleRepository;
 import com.gabrielbicu.telemetry.service.DtcDecoderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TelemetryService {
+
+    private static final Logger log = LoggerFactory.getLogger(TelemetryService.class);
 
     private final TelemetryReadingRepository readingRepository;
     private final TripRepository tripRepository;
@@ -87,7 +91,11 @@ public class TelemetryService {
         // request path: fire-and-forget the reading to Kafka. If the broker is
         // down the producer logs and moves on — ingestion stays synchronous
         // and reliable regardless of Kafka's availability.
-        eventProducer.publishReading(saved, vehicleId, userId);
+        try {
+            eventProducer.publishReading(saved, vehicleId, userId);
+        } catch (Exception e) {
+            log.error("Failed to publish telemetry reading event to Kafka for reading {}: {}", saved.getId(), e.getMessage());
+        }
 
         return telemetryMapper.toResponse(saved);
     }
