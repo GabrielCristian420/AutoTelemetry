@@ -270,6 +270,7 @@ class TelemetryServiceTest {
         TelemetryReading mapped = new TelemetryReading();
         mapped.setDtcCodes(new HashSet<>());
         TelemetryReading saved = new TelemetryReading();
+        saved.setId(100L);
         saved.setDtcCodes(new HashSet<>());
 
         when(tripRepository.findById(tripId)).thenReturn(Optional.of(trip));

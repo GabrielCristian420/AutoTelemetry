@@ -21,6 +21,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.time.Instant;
 
 import static org.hamcrest.Matchers.is;
@@ -49,6 +51,12 @@ class VehicleStatsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private com.gabrielbicu.telemetry.service.TelemetryEventProducer telemetryEventProducer;
+
+    @MockBean
+    private com.gabrielbicu.telemetry.service.TelemetryEventConsumer telemetryEventConsumer;
 
     @Autowired
     private UserRepository userRepository;

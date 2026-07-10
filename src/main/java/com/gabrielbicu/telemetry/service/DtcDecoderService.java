@@ -64,7 +64,7 @@ public class DtcDecoderService {
             return Optional.empty();
         }
         String normalized = code.trim().toUpperCase();
-        if (!normalized.matches("^[PCBU][0-9A-C][0-9A-F]{3}$")) {
+        if (!normalized.matches("^[PCBU][0-3A-C][0-9A-F]{3}$")) {
             return Optional.empty();
         }
 
