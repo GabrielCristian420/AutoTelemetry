@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api/client";
 import VehicleMap from "../components/map/VehicleMap";
+import TelemetryChart from "../components/charts/TelemetryChart";
 
 const WINDOW = 50;
 const TRAIL_MAX = 200;
@@ -102,8 +103,8 @@ export default function LiveTracking() {
       <VehicleMap trail={tripTrail} latest={latest} />
 
       <div className="card">
-        <strong>Charts</strong>
-        <p style={{ color: "var(--muted)" }}>Speed / RPM charts render here (TelemetryChart).</p>
+        <strong>Telemetry</strong>
+        <TelemetryChart data={chartWindow} />
       </div>
     </div>
   );
