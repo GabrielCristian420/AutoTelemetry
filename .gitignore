@@ -36,7 +36,17 @@ out/
 # ---------- Spring Boot ----------
 *.log
 logs/
+*.err
  HELP.md
+
+# ---------- Python (simulator) ----------
+__pycache__/
+*.pyc
+simulator/__pycache__/
+
+# ---------- Agent tooling (not project deliverables) ----------
+.agents/
+skills-lock.json
 
 # ---------- OS ----------
 .DS_Store
