@@ -21,6 +21,8 @@ public record TelemetryEvent(
         Integer rpm,
         Double engineTempC,
         Double fuelLevelPct,
+        Double lat,
+        Double lng,
         java.util.List<String> dtcCodes
 ) {
 }

@@ -107,7 +107,8 @@ public class VehicleController {
         return liveTelemetryService.getRecent(id).stream()
                 .map(e -> new LiveTelemetryResponse(
                         e.readingId(), e.tripId(), e.vehicleId(), e.recordedAt(),
-                        e.speedKmh(), e.rpm(), e.engineTempC(), e.fuelLevelPct(), e.dtcCodes()))
+                        e.speedKmh(), e.rpm(), e.engineTempC(), e.fuelLevelPct(),
+                        e.lat(), e.lng(), e.dtcCodes()))
                 .toList();
     }
 }

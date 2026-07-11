@@ -19,6 +19,8 @@ public record LiveTelemetryResponse(
         Integer rpm,
         Double engineTempC,
         Double fuelLevelPct,
+        Double lat,
+        Double lng,
         List<String> dtcCodes
 ) {
 }
