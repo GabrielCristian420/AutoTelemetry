@@ -3,21 +3,31 @@ import { useEffect } from "react";
 import L from "leaflet";
 
 const DARK_TILES =
-  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
 
 const dotIcon = L.divIcon({
   className: "",
   html:
-    '<div style="width:16px;height:16px;border-radius:50%;background:#10b981;box-shadow:0 0 0 6px rgba(16,185,129,0.35);"></div>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
+    '<div style="width:18px;height:18px;border-radius:50%;background:#10b981;border:2px solid #052e22;box-shadow:0 0 0 8px rgba(16,185,129,0.35);"></div>',
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
 });
 
 function Recenter({ position }) {
   const map = useMap();
   useEffect(() => {
+    map.invalidateSize();
     if (position) map.setView(position, Math.max(map.getZoom(), 14));
   }, [position, map]);
+  return null;
+}
+
+function InvalidateOnMount() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
+  }, [map]);
   return null;
 }
 
@@ -49,6 +59,7 @@ export default function VehicleMap({ trail, latest }) {
           </Marker>
         )}
         <Recenter position={current} />
+        <InvalidateOnMount />
       </MapContainer>
     </div>
   );
