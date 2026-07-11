@@ -4,7 +4,7 @@ A backend platform for ingesting, storing, and analyzing **vehicle telemetry dat
 
 It explores the backend challenges that show up in the connected-car / automotive domain: high-frequency ingestion, time-series storage, trip reconstruction, real-time streaming via Kafka, and OBD-II fault-code decoding — surfaced through a live React map and dashboard.
 
-## Tech stack
+## 🧱 Tech stack
 
 | Layer | Technology |
 |------|------------|
@@ -22,7 +22,7 @@ It explores the backend challenges that show up in the connected-car / automotiv
 | Frontend | React 18 · Vite · Leaflet · Chart.js |
 | Simulator | Python 3 (OBD-II telemetry streamer) |
 
-## Quick start
+## 🚀 Quick start
 
 Requirements: **Java 21+**, **Docker**, **Node 18+**, **Python 3**.
 
@@ -55,7 +55,7 @@ curl http://localhost:8080/api/health
 # {"status":"UP","timestamp":"2026-..."}
 ```
 
-## Domain model
+## 🗺️ Domain model
 
 ```mermaid
 erDiagram
@@ -125,7 +125,7 @@ erDiagram
 
 Each reading is published to Kafka (`telemetry-events`) by `TelemetryEventProducer`, then consumed and held in a per-vehicle ring buffer (last 50 samples) by `LiveTelemetryService`. `GET /api/vehicles/{id}/live` returns that buffer ordered oldest→newest, with the latest sample (`lat`/`lng`, speed, RPM, fuel, active DTCs) exposed for the live map.
 
-## API
+## 📡 API
 
 All endpoints are under the `/api` base path. Mutation endpoints require a `Bearer` JWT from `/api/auth/login`.
 
@@ -146,53 +146,117 @@ All endpoints are under the `/api` base path. Mutation endpoints require a `Bear
 | `GET` | `/api/vehicles/{id}/stats` | JWT | Aggregated stats (avg speed, fuel drop, distance) |
 | `GET` | `/api/vehicles/{id}/live` | JWT | Live ring buffer (last 50 samples) + latest position |
 
-## Project structure
+## 📂 Project structure
 
-```text
-AutoTelemetry/
-├── docker-compose.yml            # PostgreSQL, Zookeeper, Kafka
-├── pom.xml                       # Maven build (Spring Boot)
-├── src/
-│   ├── main/
-│   │   ├── java/com/gabrielbicu/telemetry/
-│   │   │   ├── TelemetryApplication.java
-│   │   │   ├── config/           # SecurityConfig, JwtConfig, Kafka config
-│   │   │   ├── controller/       # Auth, Health, Telemetry, Trip, Vehicle
-│   │   │   ├── domain/           # JPA entities (User, Vehicle, Trip, ...)
-│   │   │   ├── dto/              # request/response models (incl. LiveTelemetryResponse)
-│   │   │   ├── exception/        # GlobalExceptionHandler
-│   │   │   ├── mapper/           # entity <-> DTO mappers
-│   │   │   ├── repository/       # Spring Data JPA interfaces
-│   │   │   └── service/          # business logic, Kafka producer, LiveTelemetryService
-│   │   └── resources/
-│   │       ├── application.yml
-│   │       └── db/migration/     # Flyway SQL scripts
-│   └── test/java/...             # mirrors main/
-├── frontend/                     # React 18 + Vite dashboard
-│   └── src/
-│       ├── api/client.js         # fetch wrapper + JWT
-│       ├── components/
-│       │   ├── charts/TelemetryChart.jsx
-│       │   ├── layout/Navbar.jsx
-│       │   └── map/VehicleMap.jsx        # Leaflet dark map + trail
-│       ├── contexts/AuthContext.jsx
-│       └── pages/                # Dashboard, LiveTracking, Login
-├── simulator/                    # Python OBD-II telemetry streamer
-│   ├── simulator.py
-│   ├── route_data.json           # synthetic GPS waypoints
-│   ├── requirements.txt
-│   └── README.md
-├── docs/diagrams/                # C4 draw.io + exported PNGs
-└── ARCHITECTURE.md               # C4 model + ADRs (source of truth)
-```
+<details open>
+  <summary><b>AutoTelemetry/</b> <i>(Click to expand/collapse)</i></summary>
+  <ul>
+    <li><code>docker-compose.yml</code> — PostgreSQL, Zookeeper, Kafka</li>
+    <li><code>pom.xml</code> — Maven build (Spring Boot)</li>
+    <li><code>ARCHITECTURE.md</code> — C4 model + ADRs (source of truth)</li>
+    <li>
+      <details>
+        <summary><b>docs/diagrams/</b></summary>
+        <ul>
+          <li><code>...</code> — C4 draw.io + exported PNGs</li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details open>
+        <summary><b>src/</b></summary>
+        <ul>
+          <li>
+            <details open>
+              <summary><b>main/</b></summary>
+              <ul>
+                <li>
+                  <details open>
+                    <summary><b>java/com/gabrielbicu/telemetry/</b></summary>
+                    <ul>
+                      <li><code>TelemetryApplication.java</code> — Entry point</li>
+                      <li><code>config/</code> — SecurityConfig, JwtConfig, Kafka config</li>
+                      <li><code>controller/</code> — Auth, Health, Telemetry, Trip, Vehicle</li>
+                      <li><code>domain/</code> — JPA entities (User, Vehicle, Trip, ...)</li>
+                      <li><code>dto/</code> — Request/response models (incl. LiveTelemetryResponse)</li>
+                      <li><code>exception/</code> — GlobalExceptionHandler</li>
+                      <li><code>mapper/</code> — Entity &lt;-&gt; DTO mappers</li>
+                      <li><code>repository/</code> — Spring Data JPA interfaces</li>
+                      <li><code>service/</code> — Business logic, Kafka producer, LiveTelemetryService</li>
+                    </ul>
+                  </details>
+                </li>
+                <li>
+                  <details>
+                    <summary><b>resources/</b></summary>
+                    <ul>
+                      <li><code>application.yml</code> — Spring Boot Configuration</li>
+                      <li><code>db/migration/</code> — Flyway SQL scripts</li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><b>test/java/...</b></summary>
+              <ul>
+                <li><code>...</code> — Unit and Integration Tests (Mirrors main/)</li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details open>
+        <summary><b>frontend/</b> — React 18 + Vite dashboard</summary>
+        <ul>
+          <li>
+            <details open>
+              <summary><b>src/</b></summary>
+              <ul>
+                <li><code>api/client.js</code> — Fetch wrapper + JWT interceptor</li>
+                <li><code>contexts/AuthContext.jsx</code> — JWT Auth state</li>
+                <li><code>pages/</code> — Dashboard, LiveTracking, Login</li>
+                <li>
+                  <details>
+                    <summary><b>components/</b></summary>
+                    <ul>
+                      <li><code>charts/TelemetryChart.jsx</code> — Chart.js live charts</li>
+                      <li><code>layout/Navbar.jsx</code> — Navigation bar</li>
+                      <li><code>map/VehicleMap.jsx</code> — Leaflet dark map + trail</li>
+                    </ul>
+                  </details>
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </details>
+    </li>
+    <li>
+      <details open>
+        <summary><b>simulator/</b> — Python OBD-II telemetry streamer</summary>
+        <ul>
+          <li><code>simulator.py</code> — Main simulator script</li>
+          <li><code>route_data.json</code> — Synthetic GPS waypoints</li>
+          <li><code>requirements.txt</code> — Python dependencies</li>
+          <li><code>README.md</code> — Simulator documentation</li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+</details>
 
-## IoT simulator
+## 🚗 IoT simulator
 
 `simulator/simulator.py` mimics an OBD-II device: it logs in (auto-registering if needed), drives a loop around `route_data.json`, then POSTs one telemetry reading per second to `/api/telemetry`. It interpolates RPM from speed, ramps engine temperature toward ~90°C, and drains fuel. Pass `--dtc-trigger P0301` to inject a fault mid-trip and exercise the live DTC alert.
 
 See `simulator/README.md` for the full option list (`--rate`, `--duration`, `--speed`, `--vin`, ...).
 
-## Frontend
+## 💻 Frontend
 
 The dashboard is a React 18 + Vite single-page app:
 
