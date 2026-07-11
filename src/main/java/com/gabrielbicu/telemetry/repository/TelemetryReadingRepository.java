@@ -53,9 +53,9 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
                 JOIN vehicle_readings vr ON rd.reading_id = vr.id
             )
             SELECT 
-                COALESCE(AVG(vr.speed_kmh), 0.0) as avg_speed_kmh,
+                ROUND(COALESCE(AVG(vr.speed_kmh), 0.0)::numeric, 2) as avg_speed_kmh,
                 COALESCE(MAX(vr.rpm), 0) as max_rpm,
-                COALESCE((SELECT total_fuel_drop FROM fuel_drop_calc), 0.0) as total_fuel_drop_pct,
+                ROUND(COALESCE((SELECT total_fuel_drop FROM fuel_drop_calc), 0.0)::numeric, 2) as total_fuel_drop_pct,
                 COALESCE((SELECT dtc_count FROM active_dtcs), 0) as active_dtc_count
             FROM vehicle_readings vr
             """, nativeQuery = true)

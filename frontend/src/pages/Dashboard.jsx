@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 
+const fmt = (n) => (n == null ? "—" : Number(n).toFixed(2));
+
 export default function Dashboard() {
   const [vehicles, setVehicles] = useState([]);
   const [stats, setStats] = useState({});
@@ -46,7 +48,7 @@ export default function Dashboard() {
                 </strong>{" "}
                 <span style={{ color: "var(--muted)" }}>{v.vin}</span>
                 <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-                  Avg {s.avgSpeedKmh ?? "—"} km/h · Max RPM {s.maxRpm ?? "—"} · Active DTC{" "}
+                  Avg {fmt(s.avgSpeedKmh)} km/h · Max RPM {s.maxRpm ?? "—"} · Active DTC{" "}
                   {s.activeDtcCount ?? "—"}
                 </div>
               </div>
