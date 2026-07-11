@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api/client";
+import VehicleMap from "../components/map/VehicleMap";
 
 const WINDOW = 50;
 const TRAIL_MAX = 200;
@@ -98,10 +99,7 @@ export default function LiveTracking() {
         </div>
       )}
 
-      <div className="card">
-        <strong>Map</strong>
-        <p style={{ color: "var(--muted)" }}>Live map renders here (VehicleMap).</p>
-      </div>
+      <VehicleMap trail={tripTrail} latest={latest} />
 
       <div className="card">
         <strong>Charts</strong>
