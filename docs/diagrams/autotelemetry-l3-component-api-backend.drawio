@@ -1,0 +1,226 @@
+<mxfile host="app.diagrams.net" agent="AutoTelemetry" version="24.7.0">
+  <diagram id="l3-component-api" name="AutoTelemetry — Component Diagram (API Backend)">
+    <mxGraphModel dx="1800" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1800" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="AutoTelemetry — Component Diagram (API Backend)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="900" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ========== BOUNDARY ========== -->
+        <mxCell id="boundary" value="API Backend [Container: Java 21, Spring Boot]" style="rounded=1;dashed=1;dashPattern=8 8;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#333333;fontColor=#1a1a1a;fontSize=16;fontStyle=1;verticalAlign=top;spacingTop=12;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="280" y="100" width="1320" height="1350" as="geometry" />
+        </mxCell>
+
+        <!-- ========== EXTERNAL: Web Dashboard (left) ========== -->
+        <mxCell id="web-dashboard" value="&lt;b&gt;Web Dashboard&lt;/b&gt;&lt;div&gt;[Container]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;React, Leaflet.js, Chart.js&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#ffffff;align=center;arcSize=8;fillColor=#438DD5;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="340" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ========== EXTERNAL: Driver (bottom-left) ========== -->
+        <mxCell id="driver" value="&lt;b&gt;Driver&lt;/b&gt;&lt;div&gt;[Person]&lt;/div&gt;" style="shape=mxgraph.c4.person2;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="40" y="880" width="170" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- ========== EXTERNAL: PostgreSQL (right) ========== -->
+        <mxCell id="postgresql" value="&lt;b&gt;PostgreSQL&lt;/b&gt;&lt;div&gt;[Container: Database]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;PostgreSQL 16, Flyway migrations&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#438DD5;fontColor=#ffffff;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="520" width="220" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- ========== EXTERNAL: Apache Kafka (bottom-right) ========== -->
+        <mxCell id="kafka-ext" value="&lt;b&gt;Apache Kafka&lt;/b&gt;&lt;div&gt;[Container: Message Broker]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Confluent 7.6.0&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#ffffff;align=center;arcSize=8;fillColor=#438DD5;strokeColor=#3C7FC0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="1100" width="220" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ========== SECURITY FILTER (top center) ========== -->
+        <mxCell id="security-filter" value="&lt;b&gt;JwtAuthFilter&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Security, JWT&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Validates JWT tokens, enforces authentication&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="660" y="160" width="280" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ========== COLUMN LABELS ========== -->
+        <mxCell id="lbl-controllers" value="&lt;b&gt;Controllers&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;align=center;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="380" y="310" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-services" value="&lt;b&gt;Services&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;align=center;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="760" y="310" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-repos" value="&lt;b&gt;Persistence&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;align=center;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="310" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-streaming" value="&lt;b&gt;Event Streaming&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;align=center;fontSize=12;fontColor=#475569;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1060" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ========== CONTROLLERS (left column, x=340) ========== -->
+        <mxCell id="auth-ctrl" value="&lt;b&gt;Auth Controller&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring MVC REST Controller&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;/api/auth/register, /api/auth/login&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="330" y="370" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vehicle-ctrl" value="&lt;b&gt;Vehicle Controller&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring MVC REST Controller&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;CRUD, stats, trips, live telemetry&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="330" y="560" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="trip-ctrl" value="&lt;b&gt;Trip Controller&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring MVC REST Controller&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Start/end trips, paginated readings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="330" y="750" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="telemetry-ctrl" value="&lt;b&gt;Telemetry Controller&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring MVC REST Controller&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;POST /api/telemetry ingestion&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="330" y="940" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ========== SERVICES (middle column, x=720) ========== -->
+        <mxCell id="auth-svc" value="&lt;b&gt;Auth Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Service&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Register, login, BCrypt hashing, JWT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="370" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vehicle-svc" value="&lt;b&gt;Vehicle Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Service&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;CRUD, ownership checks, stats aggregation&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="560" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="trip-svc" value="&lt;b&gt;Trip Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Service&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Trip lifecycle, paginated readings&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="750" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="telemetry-svc" value="&lt;b&gt;Telemetry Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Service&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Ingest, persist, resolve DTCs, publish to Kafka&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="940" width="260" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ========== DTC DECODER SERVICE (below telemetry-svc, same column) ========== -->
+        <mxCell id="dtc-decoder-svc" value="&lt;b&gt;DTC Decoder Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Pure Java&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Decodes OBD-II codes to descriptions&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#C9E0A5;strokeColor=#A4C26B;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="1100" width="230" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ========== EVENT STREAMING COMPONENTS ========== -->
+        <mxCell id="event-producer" value="&lt;b&gt;Telemetry Event Producer&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Kafka&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Publishes to telemetry.readings topic&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#FFD28A;strokeColor=#E6B058;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="1100" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="event-consumer" value="&lt;b&gt;Telemetry Event Consumer&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Kafka @KafkaListener&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Consumes from telemetry.readings topic&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#FFD28A;strokeColor=#E6B058;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1100" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="live-svc" value="&lt;b&gt;Live Telemetry Service&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; ConcurrentHashMap ring buffer&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;In-memory CQRS read model (last 50/vehicle)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#FFD28A;strokeColor=#E6B058;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1280" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ========== JPA REPOSITORIES (right column, x=1100) ========== -->
+        <mxCell id="jpa-repos" value="&lt;b&gt;JPA Repositories&lt;/b&gt;&lt;div&gt;[Component]&lt;/div&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;&lt;b&gt;Technology:&lt;/b&gt; Spring Data JPA, Hibernate&lt;/font&gt;&lt;br&gt;&lt;font style=&quot;font-size: 10px&quot;&gt;Database access layer, native SQL with CTEs&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#1a1a1a;align=center;arcSize=8;fillColor=#85BBF0;strokeColor=#78A8D8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="640" width="300" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: External → Internal ========== -->
+
+        <!-- Web Dashboard → Security Filter -->
+        <mxCell id="e-web-security" value="HTTPS/JSON&lt;br&gt;(all REST endpoints)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;" edge="1" parent="1" source="web-dashboard" target="security-filter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Driver → Telemetry Controller -->
+        <mxCell id="e-driver-telemetry" value="POST /api/telemetry&lt;br&gt;[JWT]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;" edge="1" parent="1" source="driver" target="telemetry-ctrl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- JPA Repos → PostgreSQL -->
+        <mxCell id="e-jpa-db" value="JDBC, JPA/Hibernate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;" edge="1" parent="1" source="jpa-repos" target="postgresql">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Security Filter ========== -->
+
+        <!-- Security Filter → Auth Controller (dashed) -->
+        <mxCell id="e-security-auth" value="Filters requests" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;dashed=1;" edge="1" parent="1" source="security-filter" target="auth-ctrl">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="215" />
+              <mxPoint x="300" y="425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Security Filter → Auth Service (validates credentials) -->
+        <mxCell id="e-security-auth-svc" value="Validates credentials" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#666666;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;dashed=1;" edge="1" parent="1" source="security-filter" target="auth-svc">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="215" />
+              <mxPoint x="1000" y="425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ========== ARROWS: Controller → Service ========== -->
+
+        <mxCell id="e-auth-auth" value="Uses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="auth-ctrl" target="auth-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-vehicle-vehicle" value="Uses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="vehicle-ctrl" target="vehicle-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Vehicle Controller also uses Live Telemetry Service (for GET /live) -->
+        <mxCell id="e-vehicle-live" value="GET /live" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;dashed=1;" edge="1" parent="1" source="vehicle-ctrl" target="live-svc">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="1330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e-trip-trip" value="Uses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="trip-ctrl" target="trip-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-telemetry-telemetry" value="Uses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="telemetry-ctrl" target="telemetry-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Service → JPA Repos ========== -->
+
+        <mxCell id="e-auth-jpa" value="Reads/writes entities" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="auth-svc" target="jpa-repos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-vehicle-jpa" value="Reads/writes entities" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="vehicle-svc" target="jpa-repos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-trip-jpa" value="Reads/writes entities" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="trip-svc" target="jpa-repos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e-telemetry-jpa" value="Reads/writes entities" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="telemetry-svc" target="jpa-repos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Telemetry Service → DTC Decoder ========== -->
+        <mxCell id="e-telemetry-dtc" value="Decodes DTC codes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="telemetry-svc" target="dtc-decoder-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Telemetry Service → Event Producer ========== -->
+        <mxCell id="e-telemetry-producer" value="Fire-and-forget publish" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="telemetry-svc" target="event-producer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Event Producer → Kafka (external) ========== -->
+        <mxCell id="e-producer-kafka" value="Publishes TelemetryEvent&lt;br&gt;[JSON]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;" edge="1" parent="1" source="event-producer" target="kafka-ext">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Kafka → Event Consumer ========== -->
+        <mxCell id="e-kafka-consumer" value="Consumes events" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1.5;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;labelBorderColor=#cccccc;dashed=1;" edge="1" parent="1" source="kafka-ext" target="event-consumer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========== ARROWS: Event Consumer → Live Telemetry Service ========== -->
+        <mxCell id="e-consumer-live" value="Feeds buffer" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1;fontSize=10;fontColor=#1a1a1a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="event-consumer" target="live-svc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
