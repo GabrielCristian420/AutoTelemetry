@@ -51,6 +51,8 @@ public class TelemetryEventProducer {
                 reading.getRpm(),
                 reading.getEngineTempC(),
                 reading.getFuelLevelPct(),
+                reading.getLat(),
+                reading.getLng(),
                 reading.getDtcCodes().stream().map(c -> c.getCode()).toList()
         );
 
