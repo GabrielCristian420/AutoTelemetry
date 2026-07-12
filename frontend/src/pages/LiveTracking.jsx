@@ -16,6 +16,7 @@ export default function LiveTracking() {
   const [error, setError] = useState(null);
   const trailRef = useRef([]);
   const seenCodes = useRef(new Set());
+  const loadedTripRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,6 +36,41 @@ export default function LiveTracking() {
         setTripTrail(trail);
         setChartWindow(ordered.slice(-WINDOW));
         setLatest(ordered.length ? ordered[ordered.length - 1] : null);
+
+        // Fetch historical readings for the active trip to initialize or restore the trail after refreshes
+        const activeReading = ordered.find((r) => r.tripId != null);
+        const currentTripId = activeReading ? activeReading.tripId : null;
+
+        if (currentTripId && loadedTripRef.current !== currentTripId) {
+          loadedTripRef.current = currentTripId;
+          api.tripReadings(currentTripId, 0, TRAIL_MAX)
+            .then((res) => {
+              if (cancelled) return;
+              if (res && res.content) {
+                const history = res.content.map((r) => ({
+                  readingId: r.id,
+                  tripId: r.tripId,
+                  recordedAt: r.recordedAt,
+                  speedKmh: r.speedKmh,
+                  rpm: r.rpm,
+                  engineTempC: r.engineTempC,
+                  fuelLevelPct: r.fuelLevelPct,
+                  lat: r.lat,
+                  lng: r.lng,
+                  dtcCodes: r.dtcCodes,
+                }));
+                const newMerged = new Map();
+                history.forEach((r) => newMerged.set(r.readingId, r));
+                trailRef.current.forEach((r) => newMerged.set(r.readingId, r));
+                const updatedTrail = Array.from(newMerged.values())
+                  .sort((a, b) => a.readingId - b.readingId)
+                  .slice(-TRAIL_MAX);
+                trailRef.current = updatedTrail;
+                setTripTrail(updatedTrail);
+              }
+            })
+            .catch(() => {});
+        }
 
         const active = new Set();
         ordered.forEach((r) => (r.dtcCodes || []).forEach((c) => active.add(c)));
