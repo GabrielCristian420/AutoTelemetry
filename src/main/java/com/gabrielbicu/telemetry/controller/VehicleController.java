@@ -5,10 +5,12 @@ import com.gabrielbicu.telemetry.dto.LiveTelemetryResponse;
 import com.gabrielbicu.telemetry.dto.TripResponse;
 import com.gabrielbicu.telemetry.dto.VehicleResponse;
 import com.gabrielbicu.telemetry.dto.VehicleStatsResponse;
+import com.gabrielbicu.telemetry.service.DemoVehicleSimulatorService;
 import com.gabrielbicu.telemetry.service.LiveTelemetryService;
 import com.gabrielbicu.telemetry.service.TripService;
 import com.gabrielbicu.telemetry.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,13 +42,16 @@ public class VehicleController {
     private final VehicleService vehicleService;
     private final TripService tripService;
     private final LiveTelemetryService liveTelemetryService;
+    private final ObjectProvider<DemoVehicleSimulatorService> demoSimulatorProvider;
 
     public VehicleController(VehicleService vehicleService,
                              TripService tripService,
-                             LiveTelemetryService liveTelemetryService) {
+                             LiveTelemetryService liveTelemetryService,
+                             ObjectProvider<DemoVehicleSimulatorService> demoSimulatorProvider) {
         this.vehicleService = vehicleService;
         this.tripService = tripService;
         this.liveTelemetryService = liveTelemetryService;
+        this.demoSimulatorProvider = demoSimulatorProvider;
     }
 
     @PostMapping
@@ -104,6 +109,7 @@ public class VehicleController {
     public List<LiveTelemetryResponse> getLiveTelemetry(@PathVariable Long id,
                                                         @AuthenticationPrincipal Long userId) {
         vehicleService.requireOwnership(id, userId);
+        demoSimulatorProvider.ifAvailable(demo -> demo.recordActivity(id));
         return liveTelemetryService.getRecent(id).stream()
                 .map(e -> new LiveTelemetryResponse(
                         e.readingId(), e.tripId(), e.vehicleId(), e.recordedAt(),
