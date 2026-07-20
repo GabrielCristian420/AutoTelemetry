@@ -23,6 +23,8 @@ public interface TelemetryReadingRepository extends JpaRepository<TelemetryReadi
      */
     Page<TelemetryReading> findByTripIdOrderByRecordedAtAsc(Long tripId, Pageable pageable);
 
+    java.util.Optional<TelemetryReading> findFirstByTripIdOrderByIdDesc(Long tripId);
+
     @Query(value = """
             WITH vehicle_readings AS (
                 SELECT 
