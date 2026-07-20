@@ -14,6 +14,7 @@ export default function LiveTracking() {
   const [tripTrail, setTripTrail] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const trailRef = useRef([]);
   const seenCodes = useRef(new Set());
   const loadedTripRef = useRef(null);
@@ -25,6 +26,7 @@ export default function LiveTracking() {
       try {
         const data = await api.live(id);
         if (cancelled) return;
+        setLoading(false);
         const ordered = [...data].sort((a, b) => a.readingId - b.readingId);
 
         const merged = new Map();
@@ -105,7 +107,10 @@ export default function LiveTracking() {
 
   return (
     <div className="grid">
-      <h2>Live tracking · Vehicle #{id}</h2>
+      <h2>
+        Live tracking · Vehicle #{id}
+        {loading && <span style={{ marginLeft: "12px", fontSize: "0.8em", opacity: 0.7 }}>📡 Connecting live stream...</span>}
+      </h2>
 
       <div className="grid stats">
         <div className="card">
