@@ -638,3 +638,24 @@ Retaining high-frequency raw data indefinitely is neither practical nor necessar
 | Connection pool exhaustion | HikariCP defaults (10 connections) + batch inserts reduce round-trips | ✅ By design |
 | Real-time reads without DB load | Kafka event stream → in-memory CQRS buffer (ADR-3, ADR-4) | ✅ Implemented |
 | Complex aggregation queries | Native SQL with CTEs + `LEAD()` window function for fuel drop calculation | ✅ Implemented |
+
+---
+
+## 7. Cloud Deployment Architecture
+
+To demonstrate production deployment without cloud costs or maintenance overhead, the AutoTelemetry containers are mapped to a serverless cloud infrastructure:
+
+| Container | Cloud Provider | Architecture | Cost |
+|-----------|----------------|--------------|------|
+| **Web Dashboard** | **Vercel** | Global Edge CDN for static SPA React build | Free |
+| **API Backend** | **Render** | Dockerized Java 21 Spring Boot Web Service | Free |
+| **Database** | **Neon.tech** | Serverless PostgreSQL 16 (Permanent instance, scale-to-zero) | Free |
+| **Kafka Stream** | **Aiven** | Managed Apache Kafka Broker | Free |
+
+### Active-on-Demand Simulation Pattern
+
+To keep the live map interactive 24/7 without consuming continuous database compute hours:
+1. **Request Interception:** When a visitor opens the live map on Vercel, the browser polls `GET /api/vehicles/{id}/live`.
+2. **Activity Recording:** The Spring Boot backend records the request timestamp in a thread-safe `ConcurrentHashMap`.
+3. **Reactive Simulation:** An internal background task (`@Profile("demo-active")`) generates 1 Hz physics telemetry only if a poll occurred within the last 10 seconds.
+4. **Scale-to-Zero Preservation:** If no visitor is viewing the map, database writes pause after 10 seconds, allowing the Neon PostgreSQL serverless database to scale to zero after 5 minutes of inactivity.
