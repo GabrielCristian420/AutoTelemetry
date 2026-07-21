@@ -42,6 +42,7 @@ export const api = {
   register: (email, password, fullName) =>
     request("POST", "/api/auth/register", { email, password, fullName }),
   vehicles: () => request("GET", "/api/vehicles"),
+  createVehicle: (data) => request("POST", "/api/vehicles", data),
   vehicleStats: (id) => request("GET", `/api/vehicles/${id}/stats`),
   live: (id) => request("GET", `/api/vehicles/${id}/live`),
   tripReadings: (id, page = 0, size = 500) =>

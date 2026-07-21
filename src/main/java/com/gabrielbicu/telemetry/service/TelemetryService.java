@@ -3,6 +3,7 @@ package com.gabrielbicu.telemetry.service;
 import com.gabrielbicu.telemetry.domain.DtcCode;
 import com.gabrielbicu.telemetry.domain.TelemetryReading;
 import com.gabrielbicu.telemetry.domain.Trip;
+import com.gabrielbicu.telemetry.dto.TelemetryEvent;
 import com.gabrielbicu.telemetry.dto.TelemetryReadingRequest;
 import com.gabrielbicu.telemetry.dto.TelemetryReadingResponse;
 import com.gabrielbicu.telemetry.exception.EntityNotFoundException;
@@ -52,6 +53,7 @@ public class TelemetryService {
     private final TelemetryMapper telemetryMapper;
     private final DtcDecoderService dtcDecoderService;
     private final TelemetryEventProducer eventProducer;
+    private final LiveTelemetryService liveTelemetryService;
 
     public TelemetryService(TelemetryReadingRepository readingRepository,
                             TripRepository tripRepository,
@@ -59,7 +61,8 @@ public class TelemetryService {
                             DtcCodeRepository dtcCodeRepository,
                             TelemetryMapper telemetryMapper,
                             DtcDecoderService dtcDecoderService,
-                            TelemetryEventProducer eventProducer) {
+                            TelemetryEventProducer eventProducer,
+                            LiveTelemetryService liveTelemetryService) {
         this.readingRepository = readingRepository;
         this.tripRepository = tripRepository;
         this.vehicleRepository = vehicleRepository;
@@ -67,6 +70,7 @@ public class TelemetryService {
         this.telemetryMapper = telemetryMapper;
         this.dtcDecoderService = dtcDecoderService;
         this.eventProducer = eventProducer;
+        this.liveTelemetryService = liveTelemetryService;
     }
 
     @Transactional
@@ -86,6 +90,19 @@ public class TelemetryService {
         reading.getDtcCodes().addAll(codes);
 
         TelemetryReading saved = readingRepository.save(reading);
+
+        // Update live buffer directly so live tracking works immediately even if Kafka broker is not present
+        try {
+            List<String> dtcList = saved.getDtcCodes().stream().map(DtcCode::getCode).toList();
+            TelemetryEvent event = new TelemetryEvent(
+                    saved.getId(), trip.getId(), vehicleId, userId, saved.getRecordedAt(),
+                    saved.getSpeedKmh(), saved.getRpm(), saved.getEngineTempC(),
+                    saved.getFuelLevelPct(), saved.getLat(), saved.getLng(), dtcList
+            );
+            liveTelemetryService.record(event);
+        } catch (Exception e) {
+            log.error("Failed to record live telemetry in-memory for reading {}: {}", saved.getId(), e.getMessage());
+        }
 
         // Decouple downstream processing (live buffer, analytics) from the
         // request path: fire-and-forget the reading to Kafka. If the broker is
