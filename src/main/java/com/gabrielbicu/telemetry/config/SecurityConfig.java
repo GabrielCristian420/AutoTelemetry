@@ -88,10 +88,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         String frontendUrl = System.getenv("FRONTEND_URL");
-        List<String> allowedOrigins = (frontendUrl != null && !frontendUrl.isBlank())
-                ? List.of("http://localhost:5173", frontendUrl)
-                : List.of("http://localhost:5173");
-        config.setAllowedOrigins(allowedOrigins);
+        List<String> patterns = new java.util.ArrayList<>(List.of("http://localhost:5173", "https://*.vercel.app"));
+        if (frontendUrl != null && !frontendUrl.isBlank()) {
+            patterns.add(frontendUrl.replaceAll("/+$", ""));
+        }
+        config.setAllowedOriginPatterns(patterns);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
