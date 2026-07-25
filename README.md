@@ -4,6 +4,16 @@ A backend platform for ingesting, storing, and analyzing **vehicle telemetry dat
 
 It explores the backend challenges that show up in the connected-car / automotive domain: high-frequency ingestion, time-series storage, trip reconstruction, real-time streaming via Kafka, and OBD-II fault-code decoding — surfaced through a live React map and dashboard.
 
+## 🌐 Live Demo
+
+Try the live platform directly in your browser (no local installation required):
+
+- **Live Web Dashboard:** [https://auto-telemetry.vercel.app](https://auto-telemetry.vercel.app)
+- **Demo Account Credentials:**
+  - **Email:** `demo@autotelemetry.dev`
+  - **Password:** `DemoPass123!`
+- **Production Architecture:** Deployed on **Vercel** (Frontend), **Render** (Java 21 Spring Boot API), **Neon.tech** (Serverless PostgreSQL), and **Aiven** (Managed Apache Kafka). Features an **Active-on-Demand** reactive simulator that streams live telemetry only when visitors view the map.
+
 ## 🧱 Tech stack
 
 | Layer | Technology |
