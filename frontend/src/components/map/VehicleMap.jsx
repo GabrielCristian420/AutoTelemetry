@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from "react-leaflet";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 
 const DARK_TILES =
@@ -13,11 +13,16 @@ const dotIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
-function Recenter({ position }) {
+/** Only centers the map on the FIRST position received, then never again. */
+function InitialCenter({ position }) {
   const map = useMap();
+  const hasCentered = useRef(false);
   useEffect(() => {
     map.invalidateSize();
-    if (position) map.setView(position, Math.max(map.getZoom(), 14));
+    if (position && !hasCentered.current) {
+      map.setView(position, 7);
+      hasCentered.current = true;
+    }
   }, [position, map]);
   return null;
 }
@@ -45,7 +50,7 @@ export default function VehicleMap({ trail, latest }) {
 
   return (
     <div className="map-wrap">
-      <MapContainer center={center} zoom={14} style={{ height: "100%" }}>
+      <MapContainer center={center} zoom={7} style={{ height: "100%" }}>
         <TileLayer
           url={DARK_TILES}
           attribution="&copy; OpenStreetMap &copy; CARTO"
@@ -58,9 +63,10 @@ export default function VehicleMap({ trail, latest }) {
             <Popup>Speed {latest.speedKmh} km/h · RPM {latest.rpm}</Popup>
           </Marker>
         )}
-        <Recenter position={current} />
+        <InitialCenter position={current} />
         <InvalidateOnMount />
       </MapContainer>
     </div>
   );
 }
+
