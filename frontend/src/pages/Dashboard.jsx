@@ -51,6 +51,17 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeleteVehicle = async (vehicleId) => {
+    if (!window.confirm("Are you sure you want to delete this vehicle from your fleet?")) return;
+    try {
+      setError(null);
+      await api.deleteVehicle(vehicleId);
+      fetchVehicles();
+    } catch (e) {
+      setError(e.message || "Failed to delete vehicle");
+    }
+  };
+
   if (error) {
     return (
       <div className="grid">
@@ -83,7 +94,7 @@ export default function Dashboard() {
                   {s.activeDtcCount ?? "—"}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <button
                   className="btn"
                   onClick={() => navigate(`/vehicle/${v.id}/trips`)}
@@ -98,6 +109,19 @@ export default function Dashboard() {
                 </button>
                 <button className="btn" onClick={() => navigate(`/vehicle/${v.id}/live`)}>
                   📡 Live track
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => handleDeleteVehicle(v.id)}
+                  style={{
+                    background: "rgba(239, 68, 68, 0.12)",
+                    border: "1px solid #ef4444",
+                    color: "#ef4444",
+                    padding: "6px 10px",
+                  }}
+                  title="Delete vehicle"
+                >
+                  🗑️
                 </button>
               </div>
             </li>

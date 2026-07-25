@@ -43,6 +43,7 @@ export const api = {
     request("POST", "/api/auth/register", { email, password, fullName }),
   vehicles: () => request("GET", "/api/vehicles"),
   createVehicle: (data) => request("POST", "/api/vehicles", data),
+  deleteVehicle: (id) => request("DELETE", `/api/vehicles/${id}`),
   vehicleStats: (id) => request("GET", `/api/vehicles/${id}/stats`),
   vehicleTrips: (id) => request("GET", `/api/vehicles/${id}/trips`),
   live: (id) => request("GET", `/api/vehicles/${id}/live`),
