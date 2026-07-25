@@ -83,9 +83,23 @@ export default function Dashboard() {
                   {s.activeDtcCount ?? "—"}
                 </div>
               </div>
-              <button className="btn" onClick={() => navigate(`/vehicle/${v.id}/live`)}>
-                Live track
-              </button>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  className="btn"
+                  onClick={() => navigate(`/vehicle/${v.id}/trips`)}
+                  style={{
+                    background: "rgba(56, 189, 248, 0.12)",
+                    border: "1px solid #38bdf8",
+                    color: "#38bdf8",
+                    fontWeight: 600,
+                  }}
+                >
+                  📜 Trip history
+                </button>
+                <button className="btn" onClick={() => navigate(`/vehicle/${v.id}/live`)}>
+                  📡 Live track
+                </button>
+              </div>
             </li>
           );
         })}

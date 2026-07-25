@@ -44,6 +44,7 @@ export const api = {
   vehicles: () => request("GET", "/api/vehicles"),
   createVehicle: (data) => request("POST", "/api/vehicles", data),
   vehicleStats: (id) => request("GET", `/api/vehicles/${id}/stats`),
+  vehicleTrips: (id) => request("GET", `/api/vehicles/${id}/trips`),
   live: (id) => request("GET", `/api/vehicles/${id}/live`),
   tripReadings: (id, page = 0, size = 500) =>
     request("GET", `/api/trips/${id}/readings?page=${page}&size=${size}`),

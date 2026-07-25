@@ -4,6 +4,7 @@ import Navbar from "./components/layout/Navbar";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import LiveTracking from "./pages/LiveTracking";
+import TripHistory from "./pages/TripHistory";
 
 function RequireAuth({ children }) {
   const { token } = useAuth();
@@ -22,6 +23,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/vehicle/:id/live" element={<LiveTracking />} />
+              <Route path="/vehicle/:id/trips" element={<TripHistory />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </RequireAuth>

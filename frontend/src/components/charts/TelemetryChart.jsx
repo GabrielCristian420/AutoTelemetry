@@ -19,7 +19,7 @@ ChartJS.register(
 );
 
 export default function TelemetryChart({ data }) {
-  const labels = data.map((r) => r.readingId);
+  const labels = data.map((r, i) => r.recordedAt ? new Date(r.recordedAt).toLocaleTimeString() : (r.readingId || r.id || i + 1));
   const chartData = {
     labels,
     datasets: [

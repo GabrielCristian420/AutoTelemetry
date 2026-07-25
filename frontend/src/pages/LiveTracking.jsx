@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import VehicleMap from "../components/map/VehicleMap";
 import TelemetryChart from "../components/charts/TelemetryChart";
@@ -9,6 +9,7 @@ const TRAIL_MAX = 200;
 
 export default function LiveTracking() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [latest, setLatest] = useState(null);
   const [chartWindow, setChartWindow] = useState([]);
   const [tripTrail, setTripTrail] = useState([]);
@@ -107,10 +108,15 @@ export default function LiveTracking() {
 
   return (
     <div className="grid">
-      <h2>
-        Live tracking · Vehicle #{id}
-        {loading && <span style={{ marginLeft: "12px", fontSize: "0.8em", opacity: 0.7 }}>📡 Connecting live stream...</span>}
-      </h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>
+          Live tracking · Vehicle #{id}
+          {loading && <span style={{ marginLeft: "12px", fontSize: "0.8em", opacity: 0.7 }}>📡 Connecting live stream...</span>}
+        </h2>
+        <button className="btn" onClick={() => navigate(`/vehicle/${id}/trips`)} style={{ background: "rgba(255,255,255,0.08)" }}>
+          📜 Trip History
+        </button>
+      </div>
 
       <div className="grid stats">
         <div className="card">
