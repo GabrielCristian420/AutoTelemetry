@@ -47,6 +47,7 @@ class TelemetryServiceTest {
     @Mock private TelemetryMapper telemetryMapper;
     @Mock private DtcDecoderService dtcDecoderService;
     @Mock private TelemetryEventProducer eventProducer;
+    @Mock private LiveTelemetryService liveTelemetryService;
 
     @InjectMocks private TelemetryService telemetryService;
 

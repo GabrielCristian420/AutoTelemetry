@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,17 +37,27 @@ public class LiveTelemetryService {
 
     private final Map<Long, Deque<TelemetryEvent>> liveBuffer = new ConcurrentHashMap<>();
 
+    /** Tracks seen reading IDs per vehicle to prevent duplicates from sync + Kafka paths. */
+    private final Map<Long, Set<Long>> seenIds = new ConcurrentHashMap<>();
+
     /** Called by the Kafka consumer for every ingested reading. */
     public void record(TelemetryEvent event) {
         if (event == null || event.vehicleId() == null) {
             return;
+        }
+        Set<Long> seen = seenIds.computeIfAbsent(event.vehicleId(), k -> ConcurrentHashMap.newKeySet());
+        if (event.readingId() != null && !seen.add(event.readingId())) {
+            return; // Already recorded from sync or Kafka path — skip duplicate
         }
         Deque<TelemetryEvent> buffer = liveBuffer.computeIfAbsent(
                 event.vehicleId(), k -> new ArrayDeque<>(WINDOW_SIZE));
         synchronized (buffer) {
             buffer.addLast(event);
             while (buffer.size() > WINDOW_SIZE) {
-                buffer.removeFirst();
+                TelemetryEvent evicted = buffer.removeFirst();
+                if (evicted.readingId() != null) {
+                    seen.remove(evicted.readingId());
+                }
             }
         }
     }

@@ -11,18 +11,38 @@ export default function Login() {
   const [fullName, setFullName] = useState("Demo Driver");
   const [mode, setMode] = useState("login");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
-    try {
-      if (mode === "login") await login(email, password);
-      else await register(email, password, fullName);
-      navigate("/");
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? "Invalid credentials or email already exists" : "Network error"
-      );
+    setLoading(true);
+
+    const MAX_RETRIES = 3;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (mode === "login") await login(email, password);
+        else await register(email, password, fullName);
+        setLoading(false);
+        navigate("/");
+        return;
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setLoading(false);
+          setError("Invalid credentials or email already exists");
+          return;
+        }
+        // Network error — likely Render cold start
+        if (attempt < MAX_RETRIES) {
+          setError(`⏳ Server is waking up… retrying (${attempt}/${MAX_RETRIES})`);
+          await delay(3000);
+        } else {
+          setLoading(false);
+          setError("Server is still starting up. Please wait 30 seconds and try again.");
+        }
+      }
     }
   };
 
@@ -53,8 +73,8 @@ export default function Login() {
             />
           )}
           {error && <div className="alert">{error}</div>}
-          <button className="btn" type="submit">
-            {mode === "login" ? "Sign in" : "Create account"}
+          <button className="btn" type="submit" disabled={loading}>
+            {loading ? "Connecting…" : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
         <p style={{ color: "var(--muted)", marginTop: 12 }}>
@@ -70,3 +90,4 @@ export default function Login() {
     </div>
   );
 }
+
